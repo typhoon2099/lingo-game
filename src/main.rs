@@ -1,9 +1,11 @@
-use std::io::{stdin};
+use std::io::{stdin, Read};
 use colored::*;
+use std::path::Path;
+use std::fs::File;
 
 fn main() {
     const WORD_LENGTH :usize = 5;
-    let word = String::from("HELLO");
+    let word = get_word();
     let stdin = stdin();
 
     let mut guess = String::new();
@@ -66,4 +68,17 @@ fn main() {
     }
 
     println!("Correct! Well done!")
+}
+
+fn get_word() -> String {
+    let path = Path::new("5.txt");
+    let mut file = File::open(path).expect("File could not be found");
+
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    let words: Vec<&str> = contents.lines().collect();
+
+    let position = (rand::random::<f32>() * words.len() as f32) as usize;
+
+    words[position].to_uppercase()
 }
