@@ -1,7 +1,5 @@
-use std::io::{stdin, Read};
+use std::io::stdin;
 use colored::*;
-use std::path::Path;
-use std::fs::File;
 
 fn main() {
     const WORD_LENGTH :usize = 5;
@@ -71,12 +69,8 @@ fn main() {
 }
 
 fn get_word() -> String {
-    let path = Path::new("5.txt");
-    let mut file = File::open(path).expect("File could not be found");
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    let words: Vec<&str> = contents.lines().collect();
+    let contents = String::from_utf8(include_bytes!("../5.txt").to_vec()).unwrap();
+    let words: Vec<&str> = contents.split("\n").collect();
 
     let position = (rand::random::<f32>() * words.len() as f32) as usize;
 
