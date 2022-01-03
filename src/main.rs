@@ -74,5 +74,5 @@ fn get_word() -> String {
 
     let position = (rand::random::<f32>() * words.len() as f32) as usize;
 
-    words[position].to_uppercase()
+    String::from(words[position])
 }
