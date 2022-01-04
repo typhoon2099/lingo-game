@@ -1,28 +1,49 @@
 use std::io::stdin;
 use colored::*;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+struct Opt {
+    #[structopt(short = "4", help = "Play a 4 letter word game")]
+    four: bool,
+}
+
 
 fn main() {
-    const WORD_LENGTH :usize = 5;
-    let word = get_word();
+    let opt = Opt::from_args();
+
+    println!("{}", opt.four);
+
+    let mut word_length = 5;
+
+    if opt.four {
+        word_length = 4;
+    }
+
+    let word = get_word(word_length);
     let stdin = stdin();
 
     let mut guess = String::new();
 
-    println!("{}....", String::from(word.chars().nth(0).unwrap()).green());
+    print!("{}", String::from(word.chars().nth(0).unwrap()).green());
+    for _num in 1..word_length {
+        print!(".");
+    }
+    println!();
 
     while guess.ne(&word) {
         guess = String::new();
         stdin.read_line(&mut guess).expect("Could not read input");
 
         guess = guess.trim().into();
-        if guess.len() < WORD_LENGTH {
+        if guess.len() < word_length {
             println!("Not enough characters");
             continue;
         }
 
-        guess = guess[0..WORD_LENGTH].to_uppercase();
+        guess = guess[0..word_length].to_uppercase();
 
-        let mut matches: [i8; WORD_LENGTH] = [0; WORD_LENGTH];
+        let mut matches = vec!(0; word_length);
 
         for (i, char) in guess.chars().enumerate() {
             let exact_match = char.eq(&word.chars().nth(i).unwrap());
@@ -68,9 +89,16 @@ fn main() {
     println!("Correct! Well done!")
 }
 
-fn get_word() -> String {
-    let contents = String::from_utf8(include_bytes!("../5.txt").to_vec()).unwrap();
-    let words: Vec<&str> = contents.split("\n").collect();
+fn get_word(length: usize) -> String {
+    let four = String::from_utf8(include_bytes!("../4.txt").to_vec()).unwrap();
+    let five = String::from_utf8(include_bytes!("../5.txt").to_vec()).unwrap();
+
+    let words: Vec<&str>;
+    if length == 5 {
+        words = five.split("\n").collect();
+    } else {
+        words = four.split("\n").collect();
+    }
 
     let position = (rand::random::<f32>() * words.len() as f32) as usize;
 
