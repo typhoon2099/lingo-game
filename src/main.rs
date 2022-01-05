@@ -12,10 +12,7 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
 
-    println!("{}", opt.four);
-
     let mut word_length = 5;
-
     if opt.four {
         word_length = 4;
     }
@@ -44,32 +41,35 @@ fn main() {
         guess = guess[0..word_length].to_uppercase();
 
         let mut matches = vec!(0; word_length);
+        let mut matched = vec!(false; word_length);
 
         for (i, char) in guess.chars().enumerate() {
             let exact_match = char.eq(&word.chars().nth(i).unwrap());
 
             if exact_match {
                 matches[i] = 2;
+                matched[i] = true;
             }
         }
 
         for (i, char) in guess.chars().enumerate() {
-            if matches[i] != 0 {
-                // Stop checking if we've already found an exact match
-                continue;
-            }
+            // Stop checking the current character if we've already found an exact match
+            if matches[i] != 0 { continue; }
 
-            let positions: Vec<usize> = word.match_indices(char).map(|(position, _str)| {
-                position
-            }).collect();
+            // Positions of matching characters
+            let positions: Vec<usize> = word
+                .match_indices(char)
+                .map(|(position, _str)| { position })
+                .collect();
 
             for position in positions {
-                if matches[position] != 0 {
-                    // Stop if we've already found a match (full or partial)
-                    break;
-                }
+                // Skip if we've already found a match for the current position
+                if matched[position] { continue; }
 
                 matches[i] = 1;
+                matched[position] = true;
+
+                break; // We only want the first proper match
             }
         }
 
