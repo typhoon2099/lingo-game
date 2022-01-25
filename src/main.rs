@@ -1,5 +1,5 @@
-use std::io::stdin;
 use colored::*;
+use std::io::stdin;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -8,6 +8,10 @@ struct Opt {
     four: bool,
 }
 
+struct GuessCharacter {
+    char: char,
+    position: Option<usize>,
+}
 
 fn main() {
     let opt = Opt::from_args();
@@ -40,47 +44,51 @@ fn main() {
 
         guess = guess[0..word_length].to_uppercase();
 
-        let mut matches = vec!(0; word_length);
-        let mut matched = vec!(false; word_length);
+        let mut match_data: Vec<GuessCharacter> = vec![];
 
-        for (i, char) in guess.chars().enumerate() {
-            let exact_match = char.eq(&word.chars().nth(i).unwrap());
+        for char in guess.chars() {
+            match_data.push(GuessCharacter{char, position: None});
+        };
+
+        let mut matched = vec![false; word_length];
+
+        for (i, character_match) in match_data.iter_mut().enumerate() {
+            let exact_match = character_match.char.eq(&word.chars().nth(i).unwrap());
 
             if exact_match {
-                matches[i] = 2;
                 matched[i] = true;
+                character_match.position = Some(i);
+                continue;
             }
-        }
-
-        for (i, char) in guess.chars().enumerate() {
-            // Stop checking the current character if we've already found an exact match
-            if matches[i] != 0 { continue; }
 
             // Positions of matching characters
             let positions: Vec<usize> = word
-                .match_indices(char)
-                .map(|(position, _str)| { position })
+                .match_indices(character_match.char)
+                .map(|(position, _str)| position)
                 .collect();
 
             for position in positions {
                 // Skip if we've already found a match for the current position
-                if matched[position] { continue; }
+                if matched[position] {
+                    continue;
+                }
 
-                matches[i] = 1;
                 matched[position] = true;
+                character_match.position = Some(position);
 
                 break; // We only want the first proper match
             }
         }
 
-        for (i, char) in guess.chars().enumerate() {
-            let print_char = match matches[i] {
-                1 => char.to_string().yellow(),
-                2 => char.to_string().green(),
-                _ => char.to_string().normal(),
+        for (i, character_match) in match_data.iter().enumerate() {
+            let character = match character_match.position {
+                Some(position) if position == i => character_match.char.to_string().green(),
+                Some(_position) => character_match.char.to_string().yellow(),
+                None => character_match.char.to_string().normal(),
             };
 
-            print!("{}", print_char);
+
+            print!("{}", character);
         }
 
         println!()
