@@ -47,8 +47,11 @@ fn main() {
         let mut match_data: Vec<GuessCharacter> = vec![];
 
         for char in guess.chars() {
-            match_data.push(GuessCharacter{char, position: None});
-        };
+            match_data.push(GuessCharacter {
+                char,
+                position: None,
+            });
+        }
 
         let mut matched = vec![false; word_length];
 
@@ -86,7 +89,6 @@ fn main() {
                 Some(_position) => character_match.char.to_string().yellow(),
                 None => character_match.char.to_string().normal(),
             };
-
 
             print!("{}", character);
         }
