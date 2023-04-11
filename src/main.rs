@@ -26,7 +26,7 @@ fn main() {
 
     let mut guess = String::new();
 
-    print!("{}", String::from(word.chars().nth(0).unwrap()).green());
+    print!("{}", String::from(word.chars().next().unwrap()).green());
     for _num in 1..word_length {
         print!(".");
     }
@@ -103,12 +103,11 @@ fn get_word(length: usize) -> String {
     let four = String::from_utf8(include_bytes!("../4.txt").to_vec()).unwrap();
     let five = String::from_utf8(include_bytes!("../5.txt").to_vec()).unwrap();
 
-    let words: Vec<&str>;
-    if length == 5 {
-        words = five.split("\n").collect();
+    let words: Vec<&str> = if length == 5 {
+        five.split('\n').collect()
     } else {
-        words = four.split("\n").collect();
-    }
+        four.split('\n').collect()
+    };
 
     let position = (rand::random::<f32>() * words.len() as f32) as usize;
 
