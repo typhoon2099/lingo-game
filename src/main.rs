@@ -1,10 +1,11 @@
 use colored::*;
 use std::io::stdin;
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(StructOpt)]
-struct Opt {
-    #[structopt(short = "4", help = "Play a 4 letter word game")]
+#[derive(Parser, Debug)]
+struct Args {
+    /// Play a 4 letter word game
+    #[arg(short = '4')]
     four: bool,
 }
 
@@ -14,10 +15,10 @@ struct GuessCharacter {
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let args = Args::parse();
 
     let mut word_length = 5;
-    if opt.four {
+    if args.four {
         word_length = 4;
     }
 
